@@ -2,6 +2,8 @@
 use std::io::{ self, Write };
 use std::process::Command;
 
+#[allow(unused_must_use)]
+#[allow(unused_variables)]
 fn main() {
     let stdin = io::stdin();
     let path_env = std::env::var("PATH").unwrap();
@@ -46,6 +48,23 @@ fn main() {
                         } else {
                             println!("{} not found", cmd);
                         }
+                    }
+                }
+                "cd" => {
+                    if argv.len() != 2 {
+                        println!("cd: expected 1 argument, got {}", argv.len() - 1);
+                        continue;
+                    }
+                    let path = argv[1];
+                    if argv[1] == "~" {
+                        let home = std::env::var("HOME").unwrap();
+                        if let Err(e) = std::env::set_current_dir(&home) {
+                            println!("cd: {}: No such file or directory", home);
+                        }
+                        continue;
+                    }
+                    if let Err(e) = std::env::set_current_dir(path) {
+                        println!("cd: {}: No such file or directory", path);
                     }
                 }
                 _ => println!("{}: command not found", argv[0]),
